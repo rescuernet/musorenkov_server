@@ -3,7 +3,12 @@ import { Document } from 'mongoose';
 
 export type ProductDocument = Product & Document;
 
-@Schema()
+@Schema({
+    timestamps:{
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt'
+    }
+})
 export class Product {
     @Prop()
     title: string

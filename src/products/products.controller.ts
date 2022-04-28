@@ -4,7 +4,7 @@ import {UpdateProductDTO} from "./dto/update-product.dto";
 import {ProductsService} from "./products.service";
 import {Product} from "./schemas/product.schema";
 
-@Controller('products')
+@Controller('/api/products')
 export class ProductsController {
     constructor(private readonly prodService: ProductsService) {
     }
