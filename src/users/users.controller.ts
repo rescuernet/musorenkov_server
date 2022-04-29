@@ -1,8 +1,9 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Put} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {User} from "./user.schema";
+import {JwtAuthGuard} from "../auth/jwt-auth-guard";
 
 @Controller('/api/users')
 export class UsersController {
@@ -13,6 +14,7 @@ export class UsersController {
     return this.usersService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
