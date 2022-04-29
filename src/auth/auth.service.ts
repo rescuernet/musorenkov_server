@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import {Body, HttpException, HttpStatus, Injectable, Post, UnauthorizedException} from '@nestjs/common';
+import {CreateUserDto} from "../users/dto/create-user.dto";
+import {UsersService} from "../users/users.service";
+import {JwtService} from "@nestjs/jwt";
+import {User} from "../users/user.schema";
+import * as bcrypt from 'bcryptjs'
+import {threadId} from "worker_threads";
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+
+  constructor(private userService: UsersService, private jwtService: JwtService) {}
+
+  async login(userDto: CreateUserDto) {
+    const user = await this.validateUser(userDto)
+    return this.generateToken(user)
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async registration(userDto: CreateUserDto) {
+    const candidate = await this.userService.findOneByEmail(userDto.email)
+    if(candidate){
+      throw new HttpException('Пользователь с таким email уже зарегистрирован', HttpStatus.BAD_REQUEST)
+    }
+    const hashPasword = await bcrypt.hash(userDto.password,5)
+    const user = await this.userService.create({...userDto,password: hashPasword})
+    return this.generateToken(user)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  private async generateToken(user){
+    const payload = {email: user.email, id: user._id}
+    return {
+      token: this.jwtService.sign(payload)
+    }
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  private async validateUser(userDto: CreateUserDto) {
+    const user = await this.userService.findOneByEmail(userDto.email)
+    const passwordEquals = await bcrypt.compare(userDto.password,user.password)
+    if(user && passwordEquals){
+      return user
+    }
+    throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
   }
 }
