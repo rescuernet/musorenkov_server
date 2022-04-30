@@ -4,7 +4,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {User} from "./user.schema";
 import {JwtAuthGuard} from "../auth/jwt-auth-guard";
+import {Roles} from "../auth/roles-auth-decorator";
+import {RolesEnum} from "../roles/dto/roles.enum";
+import {RolesGuard} from "../auth/roles-guard";
 
+@UseGuards(JwtAuthGuard)
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -14,7 +18,6 @@ export class UsersController {
     return this.usersService.create(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();

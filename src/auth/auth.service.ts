@@ -1,10 +1,9 @@
-import {Body, HttpException, HttpStatus, Injectable, Post, UnauthorizedException} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable, UnauthorizedException} from '@nestjs/common';
 import {CreateUserDto} from "../users/dto/create-user.dto";
 import {UsersService} from "../users/users.service";
 import {JwtService} from "@nestjs/jwt";
-import {User} from "../users/user.schema";
 import * as bcrypt from 'bcryptjs'
-import {threadId} from "worker_threads";
+import {RolesEnum} from "../roles/dto/roles.enum";
 
 @Injectable()
 export class AuthService {
@@ -22,14 +21,15 @@ export class AuthService {
       throw new HttpException('Пользователь с таким email уже зарегистрирован', HttpStatus.BAD_REQUEST)
     }
     const hashPasword = await bcrypt.hash(userDto.password,5)
-    const user = await this.userService.create({...userDto,password: hashPasword})
+    const user = await this.userService.create({...userDto,password: hashPasword,roles: [RolesEnum.SELLER]})
     return this.generateToken(user)
   }
 
-  private async generateToken(user){
-    const payload = {email: user.email, id: user._id}
+  private async generateToken(user:CreateUserDto){
+    const payload = {email: user.email, id: user._id, roles:user.roles}
     return {
-      token: this.jwtService.sign(payload)
+      token: this.jwtService.sign(payload),
+      tokenRefresh: this.jwtService.sign({id: payload.id}, {expiresIn: '30d'})
     }
   }
 

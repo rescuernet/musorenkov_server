@@ -6,7 +6,6 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 
-//pipe который проверяй на входе все body используется в main.ts
 export class ValidationBodyPipe implements PipeTransform<any> {
   async transform(value: any, { metatype }: ArgumentMetadata) {
     if (!metatype || !this.toValidate(metatype)) {
