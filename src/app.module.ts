@@ -13,12 +13,11 @@ import { AuthModule } from './auth/auth.module';
         ConfigModule.forRoot({
             envFilePath: `.${process.env.NODE_ENV}.env`
         }),
-        ProductsModule,
         MongooseModule.forRoot(process.env.MONGO_DB),
+        ProductsModule,
         UsersModule,
         RolesModule,
         AuthModule
     ],
 })
-export class AppModule {
-}
+export class AppModule {}
