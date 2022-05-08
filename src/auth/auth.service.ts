@@ -1,9 +1,7 @@
-import {HttpException, HttpStatus, Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {CreateUserDto} from "../users/dto/create-user.dto";
 import {UsersService} from "../users/users.service";
-import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from 'bcryptjs'
-import {RolesEnum} from "../roles/dto/roles.enum";
 import {TokenService} from "../token/token.service";
 
 @Injectable()
@@ -17,7 +15,7 @@ export class AuthService {
     return data
   }
 
-  async registration(userDto: CreateUserDto) {
+  /*async registration(userDto: CreateUserDto) {
     const candidate = await this.userService.findOneByEmail(userDto.email)
     if(candidate){
       throw new HttpException('Пользователь с таким email уже зарегистрирован', HttpStatus.BAD_REQUEST)
@@ -25,7 +23,7 @@ export class AuthService {
     const hashPasword = await bcrypt.hash(userDto.password,5)
     const user = await this.userService.create({...userDto,password: hashPasword,roles: [RolesEnum.SELLER]})
     return this.tokenService.generateToken(user)
-  }
+  }*/
 
 
   private async validateUser(userDto: CreateUserDto) {
@@ -56,6 +54,11 @@ export class AuthService {
       throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
     }
     return this.tokenService.generateToken(await userData)
-
   }
+
+  async logout(userId) {
+    return await this.tokenService.removeToken(userId);
+  }
+
+
 }

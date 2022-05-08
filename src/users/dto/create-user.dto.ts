@@ -1,13 +1,13 @@
-import {IsDefined, IsEmail, IsString} from "class-validator";
+import {IsDefined, IsEmail, IsNotEmpty, IsString} from "class-validator";
 import {RolesEnum} from "../../roles/dto/roles.enum";
 
 export class CreateUserDto {
     @IsEmail()
-    @IsDefined()
+    @IsNotEmpty()
     readonly email: string
 
     @IsString()
-    @IsDefined()
+    @IsNotEmpty()
     readonly password: string
 
     readonly _id?: string

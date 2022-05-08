@@ -23,6 +23,7 @@ export class UsersService {
     return this.userModel.findById(id)
   }
 
+
   async findOneByEmail(email: string): Promise<User> {
     return this.userModel.findOne({email:email})
   }

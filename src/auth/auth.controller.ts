@@ -20,10 +20,17 @@ export class AuthController {
         return res.json({user: data.user,token:data.tokens.token});
     }
 
-    @Post('/registration')
+    @Post('/logout')
+    async logout(@Body() userId: string, @Res() res) {
+        const data = await this.authService.logout(userId)
+        res.clearCookie('refreshToken');
+        return res.json(data);
+    }
+
+    /*@Post('/registration')
     registration(@Body() userDto: CreateUserDto) {
         return this.authService.registration(userDto);
-    }
+    }*/
 
 
     @Get('/refresh')

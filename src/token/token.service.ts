@@ -30,21 +30,20 @@ export class TokenService {
         return data
     }
 
-    async verify(token){
+    verify(token){
         try {
             return this.jwtService.verify(token)
         } catch (e) {
             throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
         }
-
     }
 
     async findTokenDB(refreshToken){
         return this.tokenModel.findOne({refreshToken})
     }
 
-    refresh(refreshToken){
-
+    async removeToken(userId) {
+        return this.tokenModel.deleteOne({user: userId.id});
     }
 
 }
