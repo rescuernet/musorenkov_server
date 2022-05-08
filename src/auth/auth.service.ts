@@ -4,15 +4,17 @@ import {UsersService} from "../users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from 'bcryptjs'
 import {RolesEnum} from "../roles/dto/roles.enum";
+import {TokenService} from "../token/token.service";
 
 @Injectable()
 export class AuthService {
 
-  constructor(private userService: UsersService, private jwtService: JwtService) {}
+  constructor(private userService: UsersService, private tokenService: TokenService) {}
 
   async login(userDto: CreateUserDto) {
     const user = await this.validateUser(userDto)
-    return this.generateToken(user)
+    const data = await this.tokenService.generateToken(user)
+    return data
   }
 
   async registration(userDto: CreateUserDto) {
@@ -22,23 +24,38 @@ export class AuthService {
     }
     const hashPasword = await bcrypt.hash(userDto.password,5)
     const user = await this.userService.create({...userDto,password: hashPasword,roles: [RolesEnum.SELLER]})
-    return this.generateToken(user)
+    return this.tokenService.generateToken(user)
   }
 
-  private async generateToken(user:CreateUserDto){
-    const payload = {email: user.email, id: user._id, roles:user.roles}
-    return {
-      token: this.jwtService.sign(payload),
-      tokenRefresh: this.jwtService.sign({id: payload.id}, {expiresIn: '30d'})
-    }
-  }
 
   private async validateUser(userDto: CreateUserDto) {
     const user = await this.userService.findOneByEmail(userDto.email)
-    const passwordEquals = await bcrypt.compare(userDto.password,user.password)
-    if(user && passwordEquals){
-      return user
+    if(user){
+      const passwordEquals = await bcrypt.compare(userDto.password,user.password)
+      if(passwordEquals){
+        return user
+      }else{
+        throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
+      }
+    }else{
+      throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
     }
-    throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
+  }
+
+  async refresh(refreshToken){
+    if(!refreshToken){
+      throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
+    }
+    const tokenData = await this.tokenService.verify(refreshToken)
+    const tokenDB = await this.tokenService.findTokenDB(refreshToken)
+    if(!tokenDB){
+      throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
+    }
+    const userData = this.userService.findOne(tokenData.id)
+    if(!userData){
+      throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
+    }
+    return this.tokenService.generateToken(await userData)
+
   }
 }

@@ -1,12 +1,9 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards} from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards} from '@nestjs/common';
+import {UsersService} from './users.service';
+import {CreateUserDto} from './dto/create-user.dto';
+import {UpdateUserDto} from './dto/update-user.dto';
 import {User} from "./user.schema";
 import {JwtAuthGuard} from "../auth/jwt-auth-guard";
-import {Roles} from "../auth/roles-auth-decorator";
-import {RolesEnum} from "../roles/dto/roles.enum";
-import {RolesGuard} from "../auth/roles-guard";
 
 @UseGuards(JwtAuthGuard)
 @Controller('/api/users')
@@ -19,7 +16,7 @@ export class UsersController {
   }
 
   @Get()
-  findAll(): Promise<User[]> {
+  findAll(@Req() req): Promise<User[]> {
     return this.usersService.findAll();
   }
 
