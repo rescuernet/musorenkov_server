@@ -1,11 +1,12 @@
 import {Module} from '@nestjs/common';
 import {MongooseModule} from "@nestjs/mongoose";
-import {ProductsModule} from "./products/products.module";
-import { UsersModule } from './users/users.module';
+import {ProductsModule} from "./entity/products/products.module";
+import { UsersModule } from './entity/users/users.module';
 import {ConfigModule} from "@nestjs/config";
-import { RolesModule } from './roles/roles.module';
+import { RolesModule } from './entity/roles/roles.module';
 import { AuthModule } from './auth/auth.module';
 import {TokenModule} from "./token/token.module";
+import { ClientsModule } from './entity/clients/clients.module';
 
 @Module({
     controllers: [],
@@ -19,6 +20,7 @@ import {TokenModule} from "./token/token.module";
         UsersModule,
         RolesModule,
         AuthModule,
+        ClientsModule,
     ],
 })
 

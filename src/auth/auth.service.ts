@@ -1,6 +1,6 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
-import {CreateUserDto} from "../users/dto/create-user.dto";
-import {UsersService} from "../users/users.service";
+import {HttpException, HttpStatus, Injectable, UnauthorizedException} from '@nestjs/common';
+import {CreateUserDto} from "../entity/users/dto/create-user.dto";
+import {UsersService} from "../entity/users/users.service";
 import * as bcrypt from 'bcryptjs'
 import {TokenService} from "../token/token.service";
 
@@ -33,10 +33,12 @@ export class AuthService {
       if(passwordEquals){
         return user
       }else{
-        throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
+        throw new HttpException('Нет доступа', HttpStatus.FORBIDDEN)
+        /*throw new UnauthorizedException({message: 'Не корректные данные авторизации'})*/
       }
     }else{
-      throw new UnauthorizedException({message: 'Не корректные данные авторизации'})
+      throw new HttpException('Нет доступа', HttpStatus.FORBIDDEN)
+      /*throw new UnauthorizedException({message: 'Не корректные данные авторизации'})*/
     }
   }
 

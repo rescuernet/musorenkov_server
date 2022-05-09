@@ -10,6 +10,7 @@ async function bootstrap() {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
+    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
     next();
   });
 
@@ -19,7 +20,6 @@ async function bootstrap() {
     credentials: true,
     origin: process.env.CLIENT_URL
   });
-
 
   app.useGlobalPipes(new ValidationBodyPipe())
   await app.listen(PORT, () => console.log(`run server port ${PORT}`));
